@@ -2,7 +2,7 @@
 {% if question_list %}
     <ul>
     {% for question in question_list %} <!-- render_template 함수로 실행하는 부분-->
-        <li><a href="/detail/{{ question.id }}/">{{ question.subject }}</a></li>
+    <li><a href="{{ url_for('question.detail', question_id=question.id) }}">{{ question.subject }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
