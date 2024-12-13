@@ -244,6 +244,6 @@ def add_user():
         print(f"User {user_id} 가 추가되었습니다.")
     except SQLAlchemyError as e:
         db.session.rollback()
-        return jsonify({"erro":f"사용자 추가 중 문제가 발생했습니다.:{str(e)}"})
+        return jsonify({"erro":f"사용자 추가 중 문제가 발생했습니다.:{str(e)}"}),500
 
     return jsonify({"message":f"User {user_id}가 추가 되었습니다."}),200
