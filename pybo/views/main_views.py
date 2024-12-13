@@ -1,7 +1,7 @@
 from flask import Blueprint, url_for, render_template, jsonify,request
 # models.py에 Question 클래스를 가져와서 사용
 from werkzeug.utils import redirect
-from pybo.models import Question
+from pybo.models import Question, User
 from pybo import db
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
@@ -221,3 +221,29 @@ def delete_question(id):
         db.session.rollback() # 문제 발생시 롤백
         print(f"Update failed: {str(e)}")
         return jsonify({"error":"삭제 중 문제가 발생하였습니다."+str(e)}),500
+    
+
+# POST 회원 추가하는 앤드포인트를 추가
+@bp.route('/add_user', methods=['POST'])
+def add_user():
+    # 요청 데이터 가져오기
+    data = request.get_json()
+    user_id = data.get('user_id')
+    password = data.get('password')
+
+    if not user_id or not password:
+        return jsonify({"error":"user_id와 password는 필수항목입니다."}),400
+
+    # 새로운 User 객체 생성
+    new_user = User(user_id=user_id, password=password)
+
+    try:
+        # 데이터베이스에 추가
+        db.session.add(new_user)
+        db.session.commit()
+        print(f"User {user_id} 가 추가되었습니다.")
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({"erro":f"사용자 추가 중 문제가 발생했습니다.:{str(e)}"})
+
+    return jsonify({"message":f"User {user_id}가 추가 되었습니다."}),200
