@@ -196,4 +196,28 @@ def change_question(id):
         print(f"Update failed: {str(e)}")
         return jsonify({"error":"업데이트 중 문제가 발생하였습니다."+str(e)}),500
    
-   
+
+@bp.route('/delete_question/<int:id>', methods=['DELETE'])
+# id 값
+def delete_question(id):
+    # id로 DB에 Question 테이블을 조회해서 데이터를 삭제 하는 것이 목적
+    # 2. id로 DB에 Question 테이블에 데이터를 조회
+    question = Question.query.get(id)
+    
+    # question 없을때
+    if not question:
+        return jsonify({"error":f"id {id}에 해당하는 데이터가 없습니다."}),404
+    
+    # 데이터 존재하면
+    # 데어터를 삭제
+    try:
+        db.session.delete(question)
+        db.session.commit()
+        print(f"Question {id} has been deleteed.")
+        return jsonify({"message":f"Question {id}이 삭제 되었습니다."}),200
+    except SQLAlchemyError as e:
+        # SQLaLchemyError를 사용하기 위해
+        # 상단에 from sqlalchemy.exc import SQLAlchemyError 추가
+        db.session.rollback() # 문제 발생시 롤백
+        print(f"Update failed: {str(e)}")
+        return jsonify({"error":"삭제 중 문제가 발생하였습니다."+str(e)}),500
